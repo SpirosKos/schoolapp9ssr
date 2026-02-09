@@ -19,7 +19,7 @@ public record TeacherInsertDTO(
         @Size(min = 2)
         String lastname,
 
-//        @Pattern(regexp = "\\d{9,}", message = "VAT cannot be less than 9 digits")
+        @Pattern(regexp = "\\d{9,}", message = "VAT cannot be less than 9 digits")
         @Pattern(regexp = "\\d{9,}")
         String vat,
 
