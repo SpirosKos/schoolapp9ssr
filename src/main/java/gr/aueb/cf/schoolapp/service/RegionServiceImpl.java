@@ -19,6 +19,9 @@ public class RegionServiceImpl implements IRegionService{
 
     @Override
     public List<RegionReadOnlyDTO> findAllRegionsSortedByName() {
-        return List.of();
+        return regionRepository.findAllByOrderByNameAsc()
+                .stream()
+                .map(mapper::mapToRegionReadOnlyDTO)
+                .toList();
     }
 }
