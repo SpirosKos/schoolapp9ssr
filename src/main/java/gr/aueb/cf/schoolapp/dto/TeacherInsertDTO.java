@@ -15,7 +15,6 @@ public record TeacherInsertDTO(
 
 //        @NotNull(message = "Lastname cannot be empty")
 //        @Size (min = 2, message = "Lastname must contain at least 2 characters")
-
         @NotNull
         @Size(min = 2)
         String lastname,
