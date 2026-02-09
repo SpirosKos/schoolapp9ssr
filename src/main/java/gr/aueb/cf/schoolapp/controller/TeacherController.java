@@ -1,9 +1,15 @@
 package gr.aueb.cf.schoolapp.controller;
 
+import gr.aueb.cf.schoolapp.core.exceptions.EntityAlreadyExistsException;
+import gr.aueb.cf.schoolapp.core.exceptions.EntityInvalidArgumentException;
 import gr.aueb.cf.schoolapp.dto.RegionReadOnlyDTO;
 import gr.aueb.cf.schoolapp.dto.TeacherInsertDTO;
 import gr.aueb.cf.schoolapp.dto.TeacherReadOnlyDTO;
+import gr.aueb.cf.schoolapp.service.IRegionService;
+import gr.aueb.cf.schoolapp.service.ITeacherService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,7 +23,16 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/teachers")
+@RequiredArgsConstructor
 public class TeacherController {
+
+    private final ITeacherService teacherService;
+    private final IRegionService regionService;
+
+//    @Autowired
+//    public TeacherController(ITeacherService teacherService){
+//        this.teacherService = teacherService;
+//    }
 
     @GetMapping("/insert")
     public String getTeacherForm(Model model) {
@@ -36,14 +51,19 @@ public class TeacherController {
             return "teacher-insert";
         }
 
-        // save teacher to DB
-        TeacherReadOnlyDTO teacherReadOnlyDTO = new TeacherReadOnlyDTO("acfd-1234", "John","Kos");
+        try {
+            // save teacher to DB
+//        TeacherReadOnlyDTO teacherReadOnlyDTO = new TeacherReadOnlyDTO("acfd-1234", "John","Kos");
 //        model.addAttribute("teacherReadOnlyDTO", teacherReadOnlyDTO);
+            TeacherReadOnlyDTO teacherReadOnlyDTO = teacherService.saveTeacher(teacherInsertDTO);
 
-        // PRG - Post-Redirect-Get
-        redirectAttributes.addFlashAttribute("teacherReadOnlyDTO", teacherReadOnlyDTO);
-        return "redirect:/teachers/success";
-
+            // PRG - Post-Redirect-Get
+            redirectAttributes.addFlashAttribute("teacherReadOnlyDTO", teacherReadOnlyDTO);
+            return "redirect:/teachers/success";
+        }catch (EntityAlreadyExistsException | EntityInvalidArgumentException e) {
+            model.addAttribute("error Message", e.getMessage());
+            return "teacher-insert";
+        }
     }
 
     @GetMapping("/success")
@@ -53,10 +73,13 @@ public class TeacherController {
 
     @ModelAttribute("regionsReadOnlyDTO")        // Executed before every request handler
      public List<RegionReadOnlyDTO> regions() {
-        return List.of(
-                new RegionReadOnlyDTO(1L, "Athens"),
-                new RegionReadOnlyDTO(2L, "Crete"),
-                new RegionReadOnlyDTO(3L, "Corfu")
-        );
+
+        return regionService.findAllRegionsSortedByName();
+
+//        return List.of(
+//                new RegionReadOnlyDTO(1L, "Athens"),
+//                new RegionReadOnlyDTO(2L, "Crete"),
+//                new RegionReadOnlyDTO(3L, "Corfu")
+//        );
      }
 }
