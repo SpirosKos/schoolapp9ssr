@@ -59,4 +59,8 @@ public class TeacherService implements ITeacherService{
             throw e;
         }
     }
+
+    public boolean isTeacherExists(String vat) {
+        return teacherRepository.findByVat(vat).isPresent();
+    }
 }
