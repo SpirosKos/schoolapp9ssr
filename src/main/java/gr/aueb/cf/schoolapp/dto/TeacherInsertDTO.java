@@ -10,14 +10,14 @@ public record TeacherInsertDTO(
 //        @Size (min = 2, message = "Firstname must contain at least 2 characters")
 
         @NotNull
-        @Size
+        @Size(min =  2)
         String firstname,
 
 //        @NotNull(message = "Lastname cannot be empty")
 //        @Size (min = 2, message = "Lastname must contain at least 2 characters")
 
         @NotNull
-        @Size
+        @Size(min = 2)
         String lastname,
 
 //        @Pattern(regexp = "\\d{9,}", message = "VAT cannot be less than 9 digits")
