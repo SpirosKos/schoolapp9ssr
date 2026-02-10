@@ -1,0 +1,39 @@
+package gr.aueb.cf.schoolapp.dto;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import java.util.UUID;
+
+public record TeacherEditDTO(
+
+        @NotNull
+        UUID uuid,
+
+//        @NotNull(message = "Firstname cannot be empty")
+//        @Size (min = 2, message = "Firstname must contain at least 2 characters")
+
+        @NotNull
+        @Size(min =  2)
+        String firstname,
+
+//        @NotNull(message = "Lastname cannot be empty")
+//        @Size (min = 2, message = "Lastname must contain at least 2 characters")
+        @NotNull
+        @Size(min = 2)
+        String lastname,
+
+//        @Pattern(regexp = "\\d{9,}", message = "VAT cannot be less than 9 digits")
+        @Pattern(regexp = "\\d{9,}")
+        String vat,
+
+//        @NotNull(message = "Region cannot be empty")
+        @NotNull
+        Long regionId
+) {
+
+    public static TeacherEditDTO empty() {
+        return new TeacherEditDTO(null, "","","",0L);
+    }
+}
