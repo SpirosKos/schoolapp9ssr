@@ -32,7 +32,7 @@ public class Teacher extends AbstractEntity{
     private String firstname;
     private String lastname;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "region_id")
     private Region region;
 
