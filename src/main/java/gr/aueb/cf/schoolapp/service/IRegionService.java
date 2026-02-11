@@ -7,5 +7,3 @@ import java.util.List;
 public interface IRegionService {
     List<RegionReadOnlyDTO> findAllRegionsSortedByName();
 }
-
-

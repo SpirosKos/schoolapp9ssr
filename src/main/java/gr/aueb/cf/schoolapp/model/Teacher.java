@@ -1,6 +1,5 @@
 package gr.aueb.cf.schoolapp.model;
 
-
 import gr.aueb.cf.schoolapp.model.static_data.Region;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,8 +15,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table (name = "teachers")
-public class Teacher extends AbstractEntity{
+@Table(name = "teachers")
+public class Teacher extends AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +36,7 @@ public class Teacher extends AbstractEntity{
     private Region region;
 
     @PrePersist
-    public void initializeUUID(){
+    public void initializeUUID() {
         this.uuid = UUID.randomUUID();
     }
 

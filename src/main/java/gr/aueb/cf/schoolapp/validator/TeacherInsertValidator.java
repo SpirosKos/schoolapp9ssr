@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -18,17 +17,16 @@ public class TeacherInsertValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return TeacherInsertDTO.class.isAssignableFrom(clazz);  // or class == clazz
+        return TeacherInsertDTO.class == clazz;
     }
 
     @Override
     public void validate(Object target, Errors errors) {
         TeacherInsertDTO teacherInsertDTO = (TeacherInsertDTO) target;
 
-        if (teacherInsertDTO.vat() != null && teacherService.isTeacherExists(teacherInsertDTO.vat())){
+        if (teacherInsertDTO.vat() != null && teacherService.isTeacherExists(teacherInsertDTO.vat())) {
             log.warn("Save failed. Teacher with vat={} already exists", teacherInsertDTO.vat());
-            errors.rejectValue("vat", "vat.teacher.exist");
-
+            errors.rejectValue("vat", "vat.teacher.exists");
         }
     }
 }

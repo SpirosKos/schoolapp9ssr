@@ -1,8 +1,8 @@
 package gr.aueb.cf.schoolapp.service;
 
-import gr.aueb.cf.schoolapp.core.exceptions.EntinyNotFoundException;
 import gr.aueb.cf.schoolapp.core.exceptions.EntityAlreadyExistsException;
 import gr.aueb.cf.schoolapp.core.exceptions.EntityInvalidArgumentException;
+import gr.aueb.cf.schoolapp.core.exceptions.EntityNotFoundException;
 import gr.aueb.cf.schoolapp.dto.TeacherEditDTO;
 import gr.aueb.cf.schoolapp.dto.TeacherInsertDTO;
 import gr.aueb.cf.schoolapp.dto.TeacherReadOnlyDTO;
@@ -11,7 +11,6 @@ import gr.aueb.cf.schoolapp.model.Teacher;
 import gr.aueb.cf.schoolapp.model.static_data.Region;
 import gr.aueb.cf.schoolapp.repository.RegionRepository;
 import gr.aueb.cf.schoolapp.repository.TeacherRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +79,13 @@ public class TeacherService implements ITeacherService {
     }
 
     @Override
+    public Page<TeacherReadOnlyDTO> getPaginatedTeachersDeletedFalse(Pageable pageable) {
+        Page<Teacher> teachersPage = teacherRepository.findAllByDeletedFalse(pageable);
+        log.debug("Get paginated not deleted returned successfully page={} and size={}", teachersPage.getNumber(), teachersPage.getSize());
+        return teachersPage.map(mapper::mapToTeacherReadOnlyDTO);
+    }
+
+    @Override
     @Transactional(rollbackFor = { EntityNotFoundException.class, EntityAlreadyExistsException.class, EntityInvalidArgumentException.class} )
     public TeacherReadOnlyDTO updateTeacher(TeacherEditDTO dto)
             throws EntityNotFoundException, EntityAlreadyExistsException, EntityInvalidArgumentException {
@@ -122,18 +128,17 @@ public class TeacherService implements ITeacherService {
     }
 
     @Override
-    @Transactional(rollbackFor = EntinyNotFoundException.class)
-    public TeacherReadOnlyDTO deleteTeacherByUUID(UUID uuid) throws EntinyNotFoundException {
+    @Transactional(rollbackFor = EntityNotFoundException.class)
+    public TeacherReadOnlyDTO deleteTeacherByUUID(UUID uuid) throws EntityNotFoundException {
         try {
             Teacher teacher = teacherRepository.findByUuidAndDeletedFalse(uuid)
                     .orElseThrow(() -> new EntityNotFoundException("Teacher with uuid=" + uuid + " not found"));
 
             teacher.softDelete();
-            // No save needed if Teacher is managed ()
+            // No save needed if Teacher is managed
 //            teacherRepository.save(teacher);
             log.info("Teacher with uuid={} deleted successfully", uuid);
             return mapper.mapToTeacherReadOnlyDTO(teacher);
-
         } catch (EntityNotFoundException e) {
             log.error("Update failed for teacher with uuid={}. Teacher not found", uuid, e);
 
@@ -155,12 +160,5 @@ public class TeacherService implements ITeacherService {
             log.error("Get teacher by uuid={} failed", uuid, e);
             throw e;
         }
-    }
-
-    @Override
-    public Page<TeacherReadOnlyDTO> getPaginatedTeachersDeletedFalse(Pageable pageable) {
-        Page<Teacher> teachersPage = teacherRepository.findAllByDeletedFalse(pageable);
-        log.debug("Get paginated not deleted returned successfully page={} and size={}", teachersPage.getNumber(), teachersPage.getSize());
-        return teachersPage.map(mapper::mapToTeacherReadOnlyDTO);
     }
 }

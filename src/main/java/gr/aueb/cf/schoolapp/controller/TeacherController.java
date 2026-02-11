@@ -1,8 +1,8 @@
 package gr.aueb.cf.schoolapp.controller;
 
-import gr.aueb.cf.schoolapp.core.exceptions.EntinyNotFoundException;
 import gr.aueb.cf.schoolapp.core.exceptions.EntityAlreadyExistsException;
 import gr.aueb.cf.schoolapp.core.exceptions.EntityInvalidArgumentException;
+import gr.aueb.cf.schoolapp.core.exceptions.EntityNotFoundException;
 import gr.aueb.cf.schoolapp.dto.RegionReadOnlyDTO;
 import gr.aueb.cf.schoolapp.dto.TeacherEditDTO;
 import gr.aueb.cf.schoolapp.dto.TeacherInsertDTO;
@@ -11,10 +11,8 @@ import gr.aueb.cf.schoolapp.service.IRegionService;
 import gr.aueb.cf.schoolapp.service.ITeacherService;
 import gr.aueb.cf.schoolapp.validator.TeacherEditValidator;
 import gr.aueb.cf.schoolapp.validator.TeacherInsertValidator;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -31,8 +29,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 @Controller
-@RequestMapping("/teachers")
 @RequiredArgsConstructor
+@RequestMapping("/teachers")
 public class TeacherController {
 
     private final ITeacherService teacherService;
@@ -41,7 +39,7 @@ public class TeacherController {
     private final TeacherEditValidator teacherEditValidator;
 
 //    @Autowired
-//    public TeacherController(ITeacherService teacherService){
+//    public TeacherController(ITeacherService teacherService) {
 //        this.teacherService = teacherService;
 //    }
 
@@ -115,7 +113,7 @@ public class TeacherController {
 
     @PostMapping("/edit")
     public String updateTeacher(@Valid @ModelAttribute("teacherEditDTO") TeacherEditDTO teacherEditDTO,
-                                BindingResult bindingResult, RedirectAttributes redirectAttributes,  Model model) {
+                              BindingResult bindingResult, RedirectAttributes redirectAttributes,  Model model) {
 
         teacherEditValidator.validate(teacherEditDTO, bindingResult);
         if (bindingResult.hasErrors()) {
@@ -123,8 +121,8 @@ public class TeacherController {
         }
 
         try {
-            teacherService.updateTeacher(teacherEditDTO);
-            redirectAttributes.addFlashAttribute("teacherReadOnlyDTO", teacherEditDTO);
+            TeacherReadOnlyDTO readOnlyDTO = teacherService.updateTeacher(teacherEditDTO);
+            redirectAttributes.addFlashAttribute("teacherReadOnlyDTO", readOnlyDTO);
             return "redirect:/teachers/update-success";
         } catch (EntityNotFoundException | EntityAlreadyExistsException | EntityInvalidArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -143,14 +141,15 @@ public class TeacherController {
         return "teacher-success";
     }
 
-    @GetMapping("/delete/{uuid}")
+    @PostMapping("/delete/{uuid}")
     public String deleteTeacher(@PathVariable UUID uuid, Model model,
                                 RedirectAttributes redirectAttributes) {
+
         try {
             TeacherReadOnlyDTO readOnlyDTO = teacherService.deleteTeacherByUUID(uuid);
             redirectAttributes.addFlashAttribute("teacherReadOnlyDTO", readOnlyDTO);
-            return"redirect:/teachers/delete-success";
-        }catch (EntinyNotFoundException e) {
+            return "redirect:/teachers/delete-success";
+        } catch (EntityNotFoundException e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "teachers";
         }

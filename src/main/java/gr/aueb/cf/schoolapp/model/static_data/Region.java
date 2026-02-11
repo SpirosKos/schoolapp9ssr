@@ -3,6 +3,7 @@ package gr.aueb.cf.schoolapp.model.static_data;
 import gr.aueb.cf.schoolapp.model.Teacher;
 import jakarta.persistence.*;
 import lombok.*;
+import org.yaml.snakeyaml.events.Event;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -16,14 +17,12 @@ import java.util.Set;
 @Table(name = "regions")
 public class Region {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
     private String name;
-
 
     @Getter(AccessLevel.PROTECTED)
     @Setter(AccessLevel.PRIVATE)
@@ -40,10 +39,9 @@ public class Region {
         teacher.setRegion(this);
     }
 
-    public void removeTeacher (Teacher teacher) {
+    public void removeTeacher(Teacher teacher) {
         if (teachers == null) return;
         teachers.remove(teacher);
         teacher.setRegion(null);
     }
-
 }
