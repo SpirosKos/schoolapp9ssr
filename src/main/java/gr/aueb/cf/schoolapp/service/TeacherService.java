@@ -1,5 +1,6 @@
 package gr.aueb.cf.schoolapp.service;
 
+import gr.aueb.cf.schoolapp.core.exceptions.EntinyNotFoundException;
 import gr.aueb.cf.schoolapp.core.exceptions.EntityAlreadyExistsException;
 import gr.aueb.cf.schoolapp.core.exceptions.EntityInvalidArgumentException;
 import gr.aueb.cf.schoolapp.dto.TeacherEditDTO;
@@ -121,6 +122,27 @@ public class TeacherService implements ITeacherService {
     }
 
     @Override
+    @Transactional(rollbackFor = EntinyNotFoundException.class)
+    public TeacherReadOnlyDTO deleteTeacherByUUID(UUID uuid) throws EntinyNotFoundException {
+        try {
+            Teacher teacher = teacherRepository.findByUuidAndDeletedFalse(uuid)
+                    .orElseThrow(() -> new EntityNotFoundException("Teacher with uuid=" + uuid + " not found"));
+
+            teacher.softDelete();
+            // No save needed if Teacher is managed ()
+//            teacherRepository.save(teacher);
+            log.info("Teacher with uuid={} deleted successfully", uuid);
+            return mapper.mapToTeacherReadOnlyDTO(teacher);
+
+        } catch (EntityNotFoundException e) {
+            log.error("Update failed for teacher with uuid={}. Teacher not found", uuid, e);
+
+            // Automatic rollback due to @Transactional annotation
+            throw e;
+        }
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public TeacherEditDTO getTeacherByUUID(UUID uuid) throws EntityNotFoundException {
 
@@ -133,5 +155,12 @@ public class TeacherService implements ITeacherService {
             log.error("Get teacher by uuid={} failed", uuid, e);
             throw e;
         }
+    }
+
+    @Override
+    public Page<TeacherReadOnlyDTO> getPaginatedTeachersDeletedFalse(Pageable pageable) {
+        Page<Teacher> teachersPage = teacherRepository.findAllByDeletedFalse(pageable.toString());
+        log.debug("Get paginated not deleted returned successfully page={} and size={}", teachersPage.getNumber(), teachersPage.getSize());
+        return teachersPage.map(mapper::mapToTeacherReadOnlyDTO);
     }
 }

@@ -1,5 +1,6 @@
 package gr.aueb.cf.schoolapp.service;
 
+import gr.aueb.cf.schoolapp.core.exceptions.EntinyNotFoundException;
 import gr.aueb.cf.schoolapp.core.exceptions.EntityAlreadyExistsException;
 import gr.aueb.cf.schoolapp.core.exceptions.EntityInvalidArgumentException;
 import gr.aueb.cf.schoolapp.dto.TeacherEditDTO;
@@ -16,10 +17,15 @@ public interface ITeacherService {
             throws EntityAlreadyExistsException, EntityInvalidArgumentException;
 
     public boolean isTeacherExists(String uuid);
+
     Page<TeacherReadOnlyDTO> getPaginatedTeachers(Pageable pageable);
+    Page<TeacherReadOnlyDTO> getPaginatedTeachersDeletedFalse(Pageable pageable);
+
 
     TeacherEditDTO getTeacherByUUID(UUID uuid) throws EntityNotFoundException;
 
     TeacherReadOnlyDTO updateTeacher(TeacherEditDTO teacherEditDTO)
             throws EntityNotFoundException, EntityAlreadyExistsException, EntityInvalidArgumentException;
+
+    TeacherReadOnlyDTO deleteTeacherByUUID(UUID uuid) throws EntinyNotFoundException;
 }
