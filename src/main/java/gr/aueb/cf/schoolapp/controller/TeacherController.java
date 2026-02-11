@@ -143,7 +143,7 @@ public class TeacherController {
         return "teacher-success";
     }
 
-    @GetMapping("/delete/uuid")
+    @GetMapping("/delete/{uuid}")
     public String deleteTeacher(@PathVariable UUID uuid, Model model,
                                 RedirectAttributes redirectAttributes) {
         try {
