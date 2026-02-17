@@ -23,7 +23,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(AbstractHttpConfigurer::disable)
+//                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/index.html").permitAll()
                         .requestMatchers("/login").permitAll()
@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/teachers/edit").hasAuthority("EDIT_TEACHER")
                         .requestMatchers(HttpMethod.GET, "/teachers/update-success").hasAuthority("EDIT_TEACHER")
                         .requestMatchers(HttpMethod.POST, "/teachers/delete{uuid}").hasAuthority("DELETE_TEACHER")
-                        .requestMatchers(HttpMethod.GET, "teachers/delete/delete-success").hasAuthority("DELETE_TEACHER")
+                        .requestMatchers(HttpMethod.GET, "/teachers/delete/delete-success").hasAuthority("DELETE_TEACHER")
                         .requestMatchers("/teachers/**").hasAnyRole("ADMIN","EMPLOYEE")
                         .requestMatchers("/users/**").hasRole("ADMIN")
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/error").permitAll()
